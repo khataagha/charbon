@@ -21,11 +21,11 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Grant execute permission to gradlew
+      - name: Grant execute permission to gradle
         run: chmod +x gradle
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradle assembleDebug
 
       - name: Upload APK to artifacts
         uses: actions/upload-artifact@v5
