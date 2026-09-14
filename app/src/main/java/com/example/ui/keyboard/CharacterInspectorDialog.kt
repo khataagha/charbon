@@ -3,6 +3,7 @@ package com.example.ui.keyboard
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -49,19 +50,26 @@ import com.example.ui.theme.NotoSansSymbolsFamily
 
 @Composable
 fun CharacterInspectorDialog(
-    character: UnicodeCharacter,
+    character: UnicodeCharacter?,
     isFavorite: Boolean,
     onToggleFavorite: (Int) -> Unit,
     onInsert: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    if (character == null) return
+
     val context = LocalContext.current
     val colors = LocalCharbonColors.current
 
     fun copyToClipboard(label: String, text: String) {
-        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText(label, text)
-        clipboard.setPrimaryClip(clip)
+        try {
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+            val clip = ClipData.newPlainText(label, text)
+            clipboard?.setPrimaryClip(clip)
+            Toast.makeText(context, "Copied $label", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(context, "Failed to copy", Toast.LENGTH_SHORT).show()
+        }
     }
 
     Dialog(
@@ -90,7 +98,9 @@ fun CharacterInspectorDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = { onToggleFavorite(character.codePoint) },
+                        onClick = {
+                            onToggleFavorite(character.codePoint)
+                        },
                         modifier = Modifier.size(40.dp).testTag("dialog_favorite_button")
                     ) {
                         Icon(
