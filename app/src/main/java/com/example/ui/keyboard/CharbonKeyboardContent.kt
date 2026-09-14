@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -54,6 +55,8 @@ import com.example.repository.UnicodeRepository
 import com.example.ui.theme.CharbonTheme
 import com.example.ui.theme.LocalCharbonColors
 
+private const val TAG = "CharbonKeyboard"
+
 @Composable
 fun CharbonKeyboardContent(
     onInsertText: (String) -> Unit,
@@ -94,13 +97,17 @@ fun CharbonKeyboardContent(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 val vm = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
                 vm?.defaultVibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+                Log.d(TAG, "Haptic feedback triggered (API 31+)")
             } else {
                 @Suppress("DEPRECATION")
                 val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
                 @Suppress("DEPRECATION")
                 vibrator?.vibrate(18)
+                Log.d(TAG, "Haptic feedback triggered (legacy)")
             }
-        } catch (_: Exception) {}
+        } catch (e: Exception) {
+            Log.e(TAG, "Haptic feedback error: ${e.message}", e)
+        }
     }
 
     CharbonTheme(mode = currentTheme) {
