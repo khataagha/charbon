@@ -22,7 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Grant execute permission to gradlew
-        run: chmod +x gradlew
+        run: chmod +x gradle
 
       - name: Build debug APK
         run: ./gradlew assembleDebug
