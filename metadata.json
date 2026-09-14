@@ -1,0 +1,6 @@
+{
+  "name": "Charbon",
+  "description": "Unicode character map keyboard IME with deep Android system integration, extended Unicode coverage, and character inspector",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charbon - Download APK / AAB</title>
+  <style>
+    :root {
+      --bg: #0f1013;
+      --card-bg: #18191d;
+      --card-border: #282a30;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent: #ffffff;
+      --btn-bg: #26282e;
+      --btn-hover: #32353d;
+      --btn-primary: #f3f4f6;
+      --btn-primary-text: #0f1013;
+      --btn-primary-hover: #ffffff;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      max-width: 480px;
+      width: 100%;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+    }
+    .logo-box {
+      width: 88px;
+      height: 88px;
+      background: #ffffff;
+      border-radius: 22px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    }
+    .logo-box img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+    p.subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+    .meta-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+    .meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .meta-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background-color: var(--btn-primary);
+      color: var(--btn-primary-text);
+    }
+    .btn-primary:hover {
+      background-color: var(--btn-primary-hover);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background-color: var(--btn-bg);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+    }
+    .btn-secondary:hover {
+      background-color: var(--btn-hover);
+      transform: translateY(-1px);
+    }
+    .instructions {
+      text-align: left;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+    .instructions strong {
+      color: var(--text-main);
+    }
+    .instructions ol {
+      padding-left: 18px;
+      margin-top: 6px;
+    }
+    .instructions li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo-box">
+      <img src="/public/logo.png" alt="Charbon Logo">
+    </div>
+    <h1>Charbon</h1>
+    <p class="subtitle">Compiled Android Package & Bundle</p>
+
+    <div class="meta-grid">
+      <div class="meta-item">
+        <div class="meta-label">Package</div>
+        <div class="meta-val">uni.charbon.keyboard</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Version</div>
+        <div class="meta-val">1.0 (vCode 1)</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Target SDK</div>
+        <div class="meta-val">API 36 (Android 16)</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Min SDK</div>
+        <div class="meta-val">API 24 (Android 7.0+)</div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <a class="btn btn-primary" href="/public/charbon-debug.apk" download="charbon-debug.apk">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/>
+        </svg>
+        Download APK (23 MB)
+      </a>
+
+      <a class="btn btn-secondary" href="/public/charbon-debug.aab" download="charbon-debug.aab">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+        </svg>
+        Download AAB Bundle (19 MB)
+      </a>
+    </div>
+
+    <div class="instructions">
+      <strong>Installation Instructions:</strong>
+      <ol>
+        <li>Download the <strong>APK</strong> file on your Android device.</li>
+        <li>Open the downloaded APK. If prompted, enable <em>"Install from unknown sources"</em> for your browser or file manager.</li>
+        <li>Tap <strong>Install</strong> to complete installation.</li>
+        <li>Open Charbon and follow the prompt to activate it as an Input Method.</li>
+      </ol>
+    </div>
+  </div>
+</body>
+</html>
