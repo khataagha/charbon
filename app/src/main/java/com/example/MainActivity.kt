@@ -37,7 +37,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.FormatShapes
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -76,7 +75,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
@@ -115,7 +113,6 @@ fun CharbonSetupScreen() {
         mutableStateOf(TextFieldValue("▭ ╔═╗ ∑(x) ➔"))
     }
     var showInAppKeyboard by remember { mutableStateOf(true) }
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     var isKeyboardEnabled by remember { mutableStateOf(checkIsKeyboardEnabled(context)) }
     var isKeyboardDefault by remember { mutableStateOf(checkIsKeyboardDefault(context)) }
@@ -339,7 +336,7 @@ fun CharbonSetupScreen() {
                             }
 
                             Text(
-                                text = "Test typing extended Unicode characters (such as ▭ U+25AD, ╔, ∑, ➔) live using the interactive Charbon keyboard below, or tap the text field for system input.",
+                                text = "Test typing extended Unicode characters (such as ▭ U+25AD, ╔, ∑, ➔) live using the interactive Charbon keyboard below, or tap the text field to type manually.",
                                 color = colors.textSecondary,
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(top = 4.dp, bottom = 10.dp)
@@ -441,33 +438,6 @@ fun CharbonSetupScreen() {
                                             val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS)
                                             context.startActivity(intent)
                                         }
-                                    )
-                                }
-                            }
-
-                            // Emulator physical keyboard advisory note
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(colors.keySpecialBackground.copy(alpha = 0.5f))
-                                    .border(0.8.dp, colors.keyBorder, RoundedCornerShape(10.dp))
-                                    .padding(10.dp)
-                            ) {
-                                Row(verticalAlignment = Alignment.Top) {
-                                    Icon(
-                                        imageVector = Icons.Default.Info,
-                                        contentDescription = null,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(16.dp).padding(top = 2.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Emulator Tip: In streaming Android emulators, Android detects your computer keyboard as a physical keyboard, which causes Android to hide on-screen keyboards by default. You can test all Charbon features directly with the interactive keyboard above, or enable 'Show virtual keyboard' in Android Settings > Languages & input > Physical keyboard.",
-                                        color = colors.textSecondary,
-                                        fontSize = 11.sp,
-                                        lineHeight = 15.sp
                                     )
                                 }
                             }
