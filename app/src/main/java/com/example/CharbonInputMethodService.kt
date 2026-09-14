@@ -59,7 +59,7 @@ class CharbonInputMethodService : InputMethodService(),
     }
 
     override fun onCreateInputView(): View {
-        window?.window?.decorView?.let { decorView ->
+        window?.decorView?.let { decorView ->
             decorView.setViewTreeLifecycleOwner(this@CharbonInputMethodService)
             decorView.setViewTreeViewModelStoreOwner(this@CharbonInputMethodService)
             decorView.setViewTreeSavedStateRegistryOwner(this@CharbonInputMethodService)
