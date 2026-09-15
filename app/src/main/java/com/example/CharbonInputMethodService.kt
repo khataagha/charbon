@@ -7,6 +7,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -59,13 +60,14 @@ class CharbonInputMethodService : InputMethodService(),
     }
 
     override fun onCreateInputView(): View {
-        window?.decorView?.let { decorView ->
+        window?.window?.decorView?.let { decorView ->
             decorView.setViewTreeLifecycleOwner(this@CharbonInputMethodService)
             decorView.setViewTreeViewModelStoreOwner(this@CharbonInputMethodService)
             decorView.setViewTreeSavedStateRegistryOwner(this@CharbonInputMethodService)
         }
 
         val composeView = ComposeView(this).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setViewTreeLifecycleOwner(this@CharbonInputMethodService)
             setViewTreeViewModelStoreOwner(this@CharbonInputMethodService)
             setViewTreeSavedStateRegistryOwner(this@CharbonInputMethodService)
@@ -108,7 +110,12 @@ class CharbonInputMethodService : InputMethodService(),
         if (!selectedText.isNullOrEmpty()) {
             ic.commitText("", 1)
         } else {
-            ic.deleteSurroundingText(1, 0)
+            val before = ic.getTextBeforeCursor(2, 0)
+            if (!before.isNullOrEmpty() && Character.isSurrogate(before.last())) {
+                ic.deleteSurroundingText(2, 0)
+            } else {
+                ic.deleteSurroundingText(1, 0)
+            }
         }
     }
 

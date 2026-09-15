@@ -32,6 +32,7 @@ enum class KeyboardMode {
     CHARMAP,
     ALPHANUMERIC,
     ARROW_PAD,
+    KAOMOJI,
     CLIPBOARD
 }
 

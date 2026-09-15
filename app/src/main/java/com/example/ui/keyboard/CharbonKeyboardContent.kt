@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.FormatShapes
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.OpenWith
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TextFields
@@ -80,8 +82,11 @@ fun CharbonKeyboardContent(
     }
     var isFavoritesActive by remember { mutableStateOf(false) }
     var isRecentsActive by remember { mutableStateOf(false) }
+    var activeCustomCollection by remember { mutableStateOf<String?>(null) }
+    var customCollections by remember { mutableStateOf(prefs.getCustomCollections()) }
     var favoritesList by remember { mutableStateOf(prefs.getFavorites()) }
     var recentsList by remember { mutableStateOf(prefs.getRecents()) }
+    val keyboardHeightDp = prefs.keyboardHeightDp
 
     var selectedCharacter by remember {
         mutableStateOf<UnicodeCharacter?>(
@@ -113,13 +118,16 @@ fun CharbonKeyboardContent(
     CharbonTheme(mode = currentTheme) {
         val colors = LocalCharbonColors.current
 
-        Column(
+        Box(
             modifier = modifier
                 .fillMaxWidth()
                 .background(colors.keyboardBackground)
                 .testTag("charbon_keyboard_container")
         ) {
-            // --- TOP TOOLBAR ---
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // --- TOP TOOLBAR ---
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -168,6 +176,18 @@ fun CharbonKeyboardContent(
                             performHaptic()
                         },
                         tag = "tab_cursor"
+                    )
+
+                    // Kaomoji Tab
+                    ToolbarPill(
+                        label = "Kaomoji",
+                        icon = Icons.Default.Mood,
+                        isSelected = currentMode == KeyboardMode.KAOMOJI,
+                        onClick = {
+                            currentMode = KeyboardMode.KAOMOJI
+                            performHaptic()
+                        },
+                        tag = "tab_kaomoji"
                     )
                 }
 
@@ -232,11 +252,11 @@ fun CharbonKeyboardContent(
                 }
             }
 
-            // --- MAIN KEYBOARD BODY (Fixed 215dp height for perfect ergonomics) ---
+            // --- MAIN KEYBOARD BODY (Dynamic height based on user preference) ---
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(215.dp)
+                    .height(keyboardHeightDp.dp)
             ) {
                 when (currentMode) {
                     KeyboardMode.CHARMAP -> {
@@ -244,6 +264,8 @@ fun CharbonKeyboardContent(
                             activeBlock = activeBlock,
                             isFavoritesActive = isFavoritesActive,
                             isRecentsActive = isRecentsActive,
+                            activeCustomCollection = activeCustomCollection,
+                            customCollections = customCollections,
                             favoritesList = favoritesList,
                             recentsList = recentsList,
                             selectedCharacter = selectedCharacter,
@@ -251,19 +273,28 @@ fun CharbonKeyboardContent(
                                 activeBlock = block
                                 isFavoritesActive = false
                                 isRecentsActive = false
+                                activeCustomCollection = null
                                 prefs.lastBlockId = block.id
                                 performHaptic()
                             },
                             onSelectFavorites = {
                                 isFavoritesActive = true
                                 isRecentsActive = false
+                                activeCustomCollection = null
                                 favoritesList = prefs.getFavorites()
                                 performHaptic()
                             },
                             onSelectRecents = {
                                 isRecentsActive = true
                                 isFavoritesActive = false
+                                activeCustomCollection = null
                                 recentsList = prefs.getRecents()
+                                performHaptic()
+                            },
+                            onSelectCustomCollection = { colName ->
+                                activeCustomCollection = colName
+                                isFavoritesActive = false
+                                isRecentsActive = false
                                 performHaptic()
                             },
                             onCharacterClick = { charItem ->
@@ -281,6 +312,11 @@ fun CharbonKeyboardContent(
                             onOpenInspector = { charItem ->
                                 inspectorCharacter = charItem
                                 performHaptic()
+                            },
+                            onToggleFavorite = { cp ->
+                                prefs.toggleFavorite(cp)
+                                favoritesList = prefs.getFavorites()
+                                performHaptic()
                             }
                         )
                     }
@@ -294,7 +330,8 @@ fun CharbonKeyboardContent(
                             onBackspace = {
                                 onBackspace()
                                 performHaptic()
-                            }
+                            },
+                            showQuickSymbols = prefs.showQuickSymbolRow
                         )
                     }
 
@@ -306,6 +343,15 @@ fun CharbonKeyboardContent(
                             },
                             onSelectAll = {
                                 onSelectAll()
+                                performHaptic()
+                            }
+                        )
+                    }
+
+                    KeyboardMode.KAOMOJI -> {
+                        KaomojiGridView(
+                            onInsertText = { text ->
+                                onInsertText(text)
                                 performHaptic()
                             }
                         )
@@ -374,7 +420,7 @@ fun CharbonKeyboardContent(
                     )
                 }
 
-                // Backspace Button
+                // Continuous Repeating Backspace Button
                 Box(
                     modifier = Modifier
                         .width(54.dp)
@@ -382,7 +428,7 @@ fun CharbonKeyboardContent(
                         .clip(RoundedCornerShape(8.dp))
                         .background(colors.keySpecialBackground)
                         .border(1.dp, colors.keyBorder, RoundedCornerShape(8.dp))
-                        .clickable {
+                        .repeatingClickable {
                             onBackspace()
                             performHaptic()
                         }
@@ -421,7 +467,7 @@ fun CharbonKeyboardContent(
             }
         }
 
-        // Inspector Dialog
+        // Inspector In-Surface Overlay
         inspectorCharacter?.let { inspected ->
             CharacterInspectorDialog(
                 character = inspected,
@@ -429,18 +475,22 @@ fun CharbonKeyboardContent(
                 onToggleFavorite = { cp ->
                     prefs.toggleFavorite(cp)
                     favoritesList = prefs.getFavorites()
+                    performHaptic()
                 },
                 onInsert = { text ->
                     onInsertText(text)
                     prefs.addRecent(inspected.codePoint)
                     recentsList = prefs.getRecents()
+                    performHaptic()
                 },
                 onDismiss = {
                     inspectorCharacter = null
-                }
+                },
+                modifier = Modifier.fillMaxSize()
             )
         }
     }
+}
 }
 
 @Composable

@@ -44,8 +44,11 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.RadioButtonChecked
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Vibration
+import androidx.compose.material.icons.filled.ViewHeadline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -57,6 +60,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -109,6 +114,11 @@ fun CharbonSetupScreen() {
     val prefs = remember { CharbonPreferences(context) }
     var currentTheme by remember { mutableStateOf(prefs.themeMode) }
     var isHapticEnabled by remember { mutableStateOf(prefs.hapticFeedbackEnabled) }
+    var keyboardHeightDp by remember { mutableStateOf(prefs.keyboardHeightDp.toFloat()) }
+    var showQuickSymbols by remember { mutableStateOf(prefs.showQuickSymbolRow) }
+    var customCollections by remember { mutableStateOf(prefs.getCustomCollections()) }
+    var newCollectionName by remember { mutableStateOf("") }
+    var newCollectionCodepoints by remember { mutableStateOf("") }
     var testTextFieldValue by remember {
         mutableStateOf(TextFieldValue("▭ ╔═╗ ∑(x) ➔"))
     }
@@ -419,7 +429,7 @@ fun CharbonSetupScreen() {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(310.dp)
+                                        .height((keyboardHeightDp + 96).dp)
                                         .clip(RoundedCornerShape(12.dp))
                                         .border(1.dp, colors.keyBorder, RoundedCornerShape(12.dp))
                                         .testTag("embedded_charbon_keyboard")
@@ -553,6 +563,243 @@ fun CharbonSetupScreen() {
                                     modifier = Modifier.testTag("haptic_switch")
                                 )
                             }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Keyboard Height Slider
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.Straighten,
+                                            contentDescription = null,
+                                            tint = colors.textSecondary,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(
+                                            text = "Keyboard Height",
+                                            color = colors.textPrimary,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                    Text(
+                                        text = "${keyboardHeightDp.toInt()} dp",
+                                        color = colors.accent,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Slider(
+                                    value = keyboardHeightDp,
+                                    onValueChange = {
+                                        keyboardHeightDp = it
+                                        prefs.keyboardHeightDp = it.toInt()
+                                    },
+                                    valueRange = 170f..310f,
+                                    steps = 13,
+                                    colors = SliderDefaults.colors(
+                                        thumbColor = colors.accent,
+                                        activeTrackColor = colors.accent,
+                                        inactiveTrackColor = colors.keyBorder
+                                    ),
+                                    modifier = Modifier.testTag("slider_keyboard_height")
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Quick Symbol Row toggle
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.ViewHeadline,
+                                        contentDescription = null,
+                                        tint = colors.textSecondary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Column {
+                                        Text(
+                                            text = "Quick Symbol Number Row",
+                                            color = colors.textPrimary,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                        Text(
+                                            text = "Top row with ! @ # $ % ^ & * ( ) on ABC keyboard",
+                                            color = colors.textSecondary,
+                                            fontSize = 11.sp
+                                        )
+                                    }
+                                }
+
+                                Switch(
+                                    checked = showQuickSymbols,
+                                    onCheckedChange = {
+                                        showQuickSymbols = it
+                                        prefs.showQuickSymbolRow = it
+                                    },
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = colors.accentText,
+                                        checkedTrackColor = colors.accent
+                                    ),
+                                    modifier = Modifier.testTag("switch_quick_symbols")
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Custom Collections Manager Card
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = colors.toolbarBackground),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Tag,
+                                    contentDescription = null,
+                                    tint = colors.accent,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Custom Symbol Collections",
+                                    color = colors.textPrimary,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Group your favorite characters into custom tabs shown on the Unicode keyboard.",
+                                color = colors.textSecondary,
+                                fontSize = 12.sp
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Existing custom collections list
+                            if (customCollections.isEmpty()) {
+                                Text(
+                                    text = "No custom collections yet. Add one below!",
+                                    color = colors.textSecondary.copy(alpha = 0.7f),
+                                    fontSize = 12.sp
+                                )
+                            } else {
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    for ((colName, cps) in customCollections) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(colors.keyBackground)
+                                                .padding(horizontal = 12.dp, vertical = 8.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Column {
+                                                Text(
+                                                    text = "📁 $colName",
+                                                    color = colors.textPrimary,
+                                                    fontSize = 13.sp,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                                Text(
+                                                    text = cps.joinToString(" ") { String(Character.toChars(it)) },
+                                                    color = colors.textSecondary,
+                                                    fontSize = 12.sp
+                                                )
+                                            }
+                                            IconButton(
+                                                onClick = {
+                                                    prefs.deleteCustomCollection(colName)
+                                                    customCollections = prefs.getCustomCollections()
+                                                },
+                                                modifier = Modifier.size(28.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Clear,
+                                                    contentDescription = "Delete collection",
+                                                    tint = colors.textSecondary,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Add new collection form
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                OutlinedTextField(
+                                    value = newCollectionName,
+                                    onValueChange = { newCollectionName = it },
+                                    label = { Text("Name", fontSize = 11.sp) },
+                                    placeholder = { Text("Math, Stars...", fontSize = 11.sp) },
+                                    modifier = Modifier.weight(1f),
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                OutlinedTextField(
+                                    value = newCollectionCodepoints,
+                                    onValueChange = { newCollectionCodepoints = it },
+                                    label = { Text("Characters", fontSize = 11.sp) },
+                                    placeholder = { Text("★ ☆ ✦ ✧", fontSize = 11.sp) },
+                                    modifier = Modifier.weight(1.5f),
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = {
+                                    val trimmedName = newCollectionName.trim()
+                                    if (trimmedName.isNotEmpty() && newCollectionCodepoints.isNotEmpty()) {
+                                        val cps = mutableListOf<Int>()
+                                        var i = 0
+                                        while (i < newCollectionCodepoints.length) {
+                                            val cp = newCollectionCodepoints.codePointAt(i)
+                                            if (!Character.isWhitespace(cp)) {
+                                                cps.add(cp)
+                                            }
+                                            i += Character.charCount(cp)
+                                        }
+                                        if (cps.isNotEmpty()) {
+                                            prefs.saveCustomCollection(trimmedName, cps)
+                                            customCollections = prefs.getCustomCollections()
+                                            newCollectionName = ""
+                                            newCollectionCodepoints = ""
+                                            Toast.makeText(context, "Saved collection '$trimmedName'", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = colors.accent,
+                                    contentColor = colors.accentText
+                                ),
+                                modifier = Modifier.fillMaxWidth().testTag("button_add_collection")
+                            ) {
+                                Text("Add Custom Collection", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                            }
                         }
                     }
                 }
@@ -598,6 +845,19 @@ fun CharbonSetupScreen() {
                 }
 
                 item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Charbon • Version 1.2",
+                            color = colors.textSecondary.copy(alpha = 0.6f),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }

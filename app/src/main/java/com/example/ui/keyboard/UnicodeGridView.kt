@@ -26,6 +26,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
@@ -42,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -63,27 +65,33 @@ fun UnicodeGridView(
     activeBlock: UnicodeBlock?,
     isFavoritesActive: Boolean,
     isRecentsActive: Boolean,
+    activeCustomCollection: String? = null,
+    customCollections: Map<String, List<Int>> = emptyMap(),
     favoritesList: List<Int>,
     recentsList: List<Int>,
     selectedCharacter: UnicodeCharacter?,
     onSelectBlock: (UnicodeBlock) -> Unit,
     onSelectFavorites: () -> Unit,
     onSelectRecents: () -> Unit,
+    onSelectCustomCollection: (String) -> Unit = {},
     onCharacterClick: (UnicodeCharacter) -> Unit,
     onCharacterLongClick: (UnicodeCharacter) -> Unit,
     onOpenInspector: (UnicodeCharacter) -> Unit,
+    onToggleFavorite: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalCharbonColors.current
     var searchQuery by remember { mutableStateOf("") }
     var isSearchExpanded by remember { mutableStateOf(false) }
 
-    // Resolve characters to display based on category, search, favorites, or recents
+    // Resolve characters to display based on category, search, favorites, recents, or custom collection
     val displayCharacters: List<UnicodeCharacter> = remember(
         searchQuery,
         activeBlock,
         isFavoritesActive,
         isRecentsActive,
+        activeCustomCollection,
+        customCollections,
         favoritesList,
         recentsList
     ) {
@@ -93,6 +101,9 @@ fun UnicodeGridView(
             favoritesList.map { UnicodeRepository.getCharacter(it) }
         } else if (isRecentsActive) {
             recentsList.map { UnicodeRepository.getCharacter(it) }
+        } else if (activeCustomCollection != null && customCollections.containsKey(activeCustomCollection)) {
+            val list = customCollections[activeCustomCollection] ?: emptyList()
+            list.map { UnicodeRepository.getCharacter(it) }
         } else if (activeBlock != null) {
             UnicodeRepository.getCharactersForBlock(activeBlock)
         } else {
@@ -210,7 +221,7 @@ fun UnicodeGridView(
                         selected = isFavoritesActive,
                         onClick = onSelectFavorites,
                         label = {
-                            Text("★ Fav", fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                            Text("★ Favs", fontSize = 11.sp, fontWeight = FontWeight.Medium)
                         },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = colors.accent,
@@ -249,9 +260,34 @@ fun UnicodeGridView(
                         modifier = Modifier.height(28.dp).testTag("chip_recents")
                     )
 
+                    // Custom User Collections Chips
+                    for ((collectionName, _) in customCollections) {
+                        val isSelected = activeCustomCollection == collectionName
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { onSelectCustomCollection(collectionName) },
+                            label = {
+                                Text("📁 $collectionName", fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium)
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = colors.accent,
+                                selectedLabelColor = colors.accentText,
+                                containerColor = colors.keyBackground,
+                                labelColor = colors.textPrimary
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderColor = colors.keyBorder,
+                                selectedBorderColor = colors.accent
+                            ),
+                            modifier = Modifier.height(28.dp).testTag("chip_col_$collectionName")
+                        )
+                    }
+
                     // All Unicode Blocks
                     for (block in UnicodeRepository.BLOCKS) {
-                        val isSelected = !isFavoritesActive && !isRecentsActive && activeBlock?.id == block.id
+                        val isSelected = !isFavoritesActive && !isRecentsActive && activeCustomCollection == null && activeBlock?.id == block.id
                         FilterChip(
                             selected = isSelected,
                             onClick = { onSelectBlock(block) },
@@ -284,11 +320,12 @@ fun UnicodeGridView(
 
         // Live Character Status & Quick Inspector Banner
         if (selectedCharacter != null) {
+            val isCurrentFav = favoritesList.contains(selectedCharacter.codePoint)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(colors.keySpecialBackground)
-                    .padding(horizontal = 10.dp, vertical = 3.dp),
+                    .padding(horizontal = 10.dp, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -313,16 +350,30 @@ fun UnicodeGridView(
                     )
                 }
 
-                IconButton(
-                    onClick = { onOpenInspector(selectedCharacter) },
-                    modifier = Modifier.size(26.dp).testTag("quick_inspector_button")
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = "Inspect ${selectedCharacter.char}",
-                        tint = colors.accent,
-                        modifier = Modifier.size(16.dp)
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = { onToggleFavorite(selectedCharacter.codePoint) },
+                        modifier = Modifier.size(28.dp).testTag("quick_favorite_button")
+                    ) {
+                        Icon(
+                            imageVector = if (isCurrentFav) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                            contentDescription = if (isCurrentFav) "Remove from favorites" else "Add to favorites",
+                            tint = if (isCurrentFav) Color(0xFFFFB300) else colors.textSecondary,
+                            modifier = Modifier.size(17.dp)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { onOpenInspector(selectedCharacter) },
+                        modifier = Modifier.size(28.dp).testTag("quick_inspector_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Inspect ${selectedCharacter.char}",
+                            tint = colors.accent,
+                            modifier = Modifier.size(17.dp)
+                        )
+                    }
                 }
             }
         }
@@ -335,13 +386,41 @@ fun UnicodeGridView(
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = if (isFavoritesActive) "No favorites yet. Long-press any character to inspect and favorite!" else "No characters found",
-                    color = colors.textSecondary,
-                    fontSize = 13.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(24.dp)
-                )
+                if (isFavoritesActive) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(20.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FavoriteBorder,
+                            contentDescription = null,
+                            tint = colors.textSecondary.copy(alpha = 0.5f),
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Text(
+                            text = "No favorites yet",
+                            color = colors.textPrimary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = "Tap any character & tap the star (★), or hold a character to inspect & favorite.",
+                            color = colors.textSecondary,
+                            fontSize = 11.sp,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 15.sp
+                        )
+                    }
+                } else {
+                    Text(
+                        text = "No characters found",
+                        color = colors.textSecondary,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(24.dp)
+                    )
+                }
             }
         } else {
             LazyVerticalGrid(

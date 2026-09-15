@@ -138,7 +138,7 @@ private fun DPadButton(
             .clip(RoundedCornerShape(12.dp))
             .background(colors.keyBackground)
             .border(1.dp, colors.keyBorder, RoundedCornerShape(12.dp))
-            .clickable { onClick() },
+            .repeatingClickable(initialDelayMillis = 350L, repeatIntervalMillis = 65L) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Icon(

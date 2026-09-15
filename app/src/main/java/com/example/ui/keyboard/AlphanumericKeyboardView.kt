@@ -39,11 +39,13 @@ import com.example.ui.theme.LocalCharbonColors
 fun AlphanumericKeyboardView(
     onInsertText: (String) -> Unit,
     onBackspace: () -> Unit,
+    showQuickSymbols: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     val colors = LocalCharbonColors.current
     var isShifted by remember { mutableStateOf(false) }
 
+    val quickSymbols = listOf("±", "≠", "°", "×", "÷", "≈", "∞", "√", "π", "→")
     val row0 = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "0")
     val row1 = listOf("q", "w", "e", "r", "t", "y", "u", "i", "o", "p")
     val row2 = listOf("a", "s", "d", "f", "g", "h", "j", "k", "l")
@@ -53,9 +55,38 @@ fun AlphanumericKeyboardView(
         modifier = modifier
             .fillMaxSize()
             .background(colors.keyboardBackground)
-            .padding(horizontal = 4.dp, vertical = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+            .padding(horizontal = 4.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
+        // Optional Quick Symbol strip
+        if (showQuickSymbols) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(3.dp)
+            ) {
+                for (sym in quickSymbols) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(28.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(colors.keySpecialBackground)
+                            .border(0.6.dp, colors.keyBorder, RoundedCornerShape(4.dp))
+                            .clickable { onInsertText(sym) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = sym,
+                            color = colors.accent,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+
         // Number row
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -112,7 +143,7 @@ fun AlphanumericKeyboardView(
             Box(
                 modifier = Modifier
                     .weight(1.3f)
-                    .height(42.dp)
+                    .height(38.dp)
                     .clip(RoundedCornerShape(6.dp))
                     .background(if (isShifted) colors.accent else colors.keySpecialBackground)
                     .border(1.dp, colors.keyBorder, RoundedCornerShape(6.dp))
@@ -137,15 +168,15 @@ fun AlphanumericKeyboardView(
                 )
             }
 
-            // Quick Backspace key
+            // Continuous repeating Backspace key
             Box(
                 modifier = Modifier
                     .weight(1.3f)
-                    .height(42.dp)
+                    .height(38.dp)
                     .clip(RoundedCornerShape(6.dp))
                     .background(colors.keySpecialBackground)
                     .border(1.dp, colors.keyBorder, RoundedCornerShape(6.dp))
-                    .clickable { onBackspace() }
+                    .repeatingClickable { onBackspace() }
                     .testTag("alpha_backspace_button"),
                 contentAlignment = Alignment.Center
             ) {

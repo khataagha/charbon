@@ -106,16 +106,19 @@ object UnicodeRepository {
         val clean = query.trim()
         if (clean.isEmpty()) return emptyList()
 
-        val hexTarget = clean.removePrefix("U+").removePrefix("u+").trim().uppercase(Locale.US)
+        val hexTarget = clean.removePrefix("U+").removePrefix("u+").removePrefix("0x").trim().uppercase(Locale.US)
         val queryLower = clean.lowercase(Locale.ROOT)
 
         val results = mutableListOf<UnicodeCharacter>()
         for (b in BLOCKS) {
             val chars = getCharactersForBlock(b)
             for (c in chars) {
-                if (c.char == clean || c.hex.contains(hexTarget) || c.name.lowercase(Locale.ROOT).contains(queryLower)) {
+                val matchesChar = c.char == clean
+                val matchesHex = hexTarget.isNotEmpty() && c.hex.contains(hexTarget)
+                val matchesName = c.name.lowercase(Locale.ROOT).contains(queryLower)
+                if (matchesChar || matchesHex || matchesName) {
                     results.add(c)
-                    if (results.size >= 120) return results
+                    if (results.size >= 160) return results
                 }
             }
         }
@@ -125,7 +128,14 @@ object UnicodeRepository {
     private fun createCharacter(codePoint: Int, blockName: String): UnicodeCharacter {
         val charStr = String(Character.toChars(codePoint))
         val hexStr = Integer.toHexString(codePoint).uppercase(Locale.US).padStart(4, '0')
-        val name = KNOWN_NAMES[codePoint] ?: "$blockName SYMBOL (U+$hexStr)"
+        val officialName = try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                Character.getName(codePoint)
+            } else null
+        } catch (_: Exception) {
+            null
+        }
+        val name = KNOWN_NAMES[codePoint] ?: officialName ?: "$blockName (U+$hexStr)"
         val utf8Bytes = getUtf8Bytes(charStr)
         val htmlEntity = "&#$codePoint;"
 

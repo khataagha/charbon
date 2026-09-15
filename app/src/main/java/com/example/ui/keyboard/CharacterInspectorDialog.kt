@@ -54,7 +54,8 @@ fun CharacterInspectorDialog(
     isFavorite: Boolean,
     onToggleFavorite: (Int) -> Unit,
     onInsert: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (character == null) return
 
