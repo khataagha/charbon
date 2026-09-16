@@ -68,10 +68,10 @@ fun AlphanumericKeyboardView(
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(28.dp)
-                            .clip(RoundedCornerShape(4.dp))
+                            .height(29.dp)
+                            .clip(RoundedCornerShape(6.dp))
                             .background(colors.keySpecialBackground)
-                            .border(0.6.dp, colors.keyBorder, RoundedCornerShape(4.dp))
+                            .border(0.7.dp, colors.keyBorder, RoundedCornerShape(6.dp))
                             .clickable { onInsertText(sym) },
                         contentAlignment = Alignment.Center
                     ) {
@@ -142,11 +142,11 @@ fun AlphanumericKeyboardView(
             // Shift key
             Box(
                 modifier = Modifier
-                    .weight(1.3f)
-                    .height(38.dp)
-                    .clip(RoundedCornerShape(6.dp))
+                    .weight(1.35f)
+                    .height(43.dp)
+                    .clip(RoundedCornerShape(9.dp))
                     .background(if (isShifted) colors.accent else colors.keySpecialBackground)
-                    .border(1.dp, colors.keyBorder, RoundedCornerShape(6.dp))
+                    .border(0.9.dp, if (isShifted) colors.accent else colors.keyBorder, RoundedCornerShape(9.dp))
                     .clickable { isShifted = !isShifted }
                     .testTag("alpha_shift_button"),
                 contentAlignment = Alignment.Center
@@ -155,7 +155,7 @@ fun AlphanumericKeyboardView(
                     imageVector = Icons.Default.ArrowUpward,
                     contentDescription = "Shift",
                     tint = if (isShifted) colors.accentText else colors.textPrimary,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(19.dp)
                 )
             }
 
@@ -171,11 +171,11 @@ fun AlphanumericKeyboardView(
             // Continuous repeating Backspace key
             Box(
                 modifier = Modifier
-                    .weight(1.3f)
-                    .height(38.dp)
-                    .clip(RoundedCornerShape(6.dp))
+                    .weight(1.35f)
+                    .height(43.dp)
+                    .clip(RoundedCornerShape(9.dp))
                     .background(colors.keySpecialBackground)
-                    .border(1.dp, colors.keyBorder, RoundedCornerShape(6.dp))
+                    .border(0.9.dp, colors.keyBorder, RoundedCornerShape(9.dp))
                     .repeatingClickable { onBackspace() }
                     .testTag("alpha_backspace_button"),
                 contentAlignment = Alignment.Center
@@ -184,7 +184,7 @@ fun AlphanumericKeyboardView(
                     imageVector = Icons.AutoMirrored.Filled.Backspace,
                     contentDescription = "Backspace",
                     tint = colors.textPrimary,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(19.dp)
                 )
             }
         }
@@ -200,10 +200,10 @@ private fun AlphaKey(
     val colors = LocalCharbonColors.current
     Box(
         modifier = modifier
-            .height(42.dp)
-            .clip(RoundedCornerShape(6.dp))
+            .height(43.dp)
+            .clip(RoundedCornerShape(9.dp))
             .background(colors.keyBackground)
-            .border(0.8.dp, colors.keyBorder, RoundedCornerShape(6.dp))
+            .border(0.8.dp, colors.keyBorder, RoundedCornerShape(9.dp))
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -211,7 +211,7 @@ private fun AlphaKey(
             text = label,
             color = colors.textPrimary,
             fontSize = 17.sp,
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center
         )
     }

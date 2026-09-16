@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -65,8 +66,8 @@ fun KaomojiGridView(
                 .fillMaxWidth()
                 .background(colors.toolbarBackground)
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 6.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                .padding(horizontal = 8.dp, vertical = 5.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             val allCategories = listOf("All") + KaomojiRepository.CATEGORIES
@@ -75,6 +76,7 @@ fun KaomojiGridView(
                 FilterChip(
                     selected = isSelected,
                     onClick = { selectedCategory = cat },
+                    shape = RoundedCornerShape(9.dp),
                     label = {
                         Text(
                             text = cat,
@@ -85,7 +87,7 @@ fun KaomojiGridView(
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = colors.accent,
                         selectedLabelColor = colors.accentText,
-                        containerColor = colors.keyBackground,
+                        containerColor = colors.keySpecialBackground,
                         labelColor = colors.textPrimary
                     ),
                     border = FilterChipDefaults.filterChipBorder(
@@ -94,7 +96,7 @@ fun KaomojiGridView(
                         borderColor = colors.keyBorder,
                         selectedBorderColor = colors.accent
                     ),
-                    modifier = Modifier.height(28.dp)
+                    modifier = Modifier.height(30.dp)
                 )
             }
         }
@@ -102,7 +104,7 @@ fun KaomojiGridView(
         // Kaomoji grid
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 4.dp),
+            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
@@ -116,12 +118,12 @@ fun KaomojiGridView(
             ) { item ->
                 Box(
                     modifier = Modifier
-                        .height(44.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(10.dp))
                         .background(colors.keyBackground)
-                        .border(1.dp, colors.keyBorder, RoundedCornerShape(8.dp))
+                        .border(1.dp, colors.keyBorder, RoundedCornerShape(10.dp))
                         .clickable { onInsertText(item.text) }
-                        .padding(horizontal = 6.dp),
+                        .padding(horizontal = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
@@ -131,15 +133,16 @@ fun KaomojiGridView(
                         Text(
                             text = item.text,
                             color = colors.textPrimary,
-                            fontSize = 13.sp,
+                            fontSize = 13.5.sp,
                             fontWeight = FontWeight.Medium,
                             textAlign = TextAlign.Center,
                             maxLines = 1
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = item.description,
-                            color = colors.textSecondary.copy(alpha = 0.7f),
-                            fontSize = 9.sp,
+                            color = colors.textSecondary.copy(alpha = 0.75f),
+                            fontSize = 9.5.sp,
                             textAlign = TextAlign.Center,
                             maxLines = 1
                         )

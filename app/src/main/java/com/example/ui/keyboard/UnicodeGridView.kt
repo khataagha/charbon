@@ -3,6 +3,7 @@ package com.example.ui.keyboard
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -121,7 +122,7 @@ fun UnicodeGridView(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(colors.toolbarBackground)
-                .padding(horizontal = 6.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isSearchExpanded) {
@@ -129,17 +130,17 @@ fun UnicodeGridView(
                 Row(
                     modifier = Modifier
                         .weight(1f)
-                        .height(34.dp)
-                        .clip(RoundedCornerShape(17.dp))
-                        .background(colors.keyboardBackground)
-                        .border(1.dp, colors.accent.copy(alpha = 0.5f), RoundedCornerShape(17.dp))
+                        .height(36.dp)
+                        .clip(RoundedCornerShape(9.dp))
+                        .background(colors.keySpecialBackground)
+                        .border(1.dp, colors.accent.copy(alpha = 0.6f), RoundedCornerShape(9.dp))
                         .padding(horizontal = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        tint = colors.textSecondary,
+                        tint = colors.accent,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
@@ -158,7 +159,7 @@ fun UnicodeGridView(
                         decorationBox = { innerTextField ->
                             if (searchQuery.isEmpty()) {
                                 Text(
-                                    text = "Search by char, hex (25AD), or name...",
+                                    text = "Search char, hex (25AD), or name...",
                                     color = colors.textSecondary.copy(alpha = 0.7f),
                                     fontSize = 12.sp,
                                     maxLines = 1
@@ -187,7 +188,7 @@ fun UnicodeGridView(
                         isSearchExpanded = false
                         searchQuery = ""
                     },
-                    modifier = Modifier.size(34.dp)
+                    modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Clear,
@@ -199,7 +200,7 @@ fun UnicodeGridView(
                 // Search Icon trigger
                 IconButton(
                     onClick = { isSearchExpanded = true },
-                    modifier = Modifier.size(34.dp).testTag("search_toggle_button")
+                    modifier = Modifier.size(32.dp).testTag("search_toggle_button")
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -213,20 +214,21 @@ fun UnicodeGridView(
                     modifier = Modifier
                         .weight(1f)
                         .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Favorites Chip
                     FilterChip(
                         selected = isFavoritesActive,
                         onClick = onSelectFavorites,
+                        shape = RoundedCornerShape(9.dp),
                         label = {
-                            Text("★ Favs", fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                            Text("★ Favs", fontSize = 11.sp, fontWeight = if (isFavoritesActive) FontWeight.Bold else FontWeight.Medium)
                         },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = colors.accent,
                             selectedLabelColor = colors.accentText,
-                            containerColor = colors.keyBackground,
+                            containerColor = colors.keySpecialBackground,
                             labelColor = colors.textPrimary
                         ),
                         border = FilterChipDefaults.filterChipBorder(
@@ -235,20 +237,21 @@ fun UnicodeGridView(
                             borderColor = colors.keyBorder,
                             selectedBorderColor = colors.accent
                         ),
-                        modifier = Modifier.height(28.dp).testTag("chip_favorites")
+                        modifier = Modifier.height(30.dp).testTag("chip_favorites")
                     )
 
                     // Recents Chip
                     FilterChip(
                         selected = isRecentsActive,
                         onClick = onSelectRecents,
+                        shape = RoundedCornerShape(9.dp),
                         label = {
-                            Text("🕒 Recents", fontSize = 11.sp, fontWeight = FontWeight.Medium)
+                            Text("🕒 Recents", fontSize = 11.sp, fontWeight = if (isRecentsActive) FontWeight.Bold else FontWeight.Medium)
                         },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = colors.accent,
                             selectedLabelColor = colors.accentText,
-                            containerColor = colors.keyBackground,
+                            containerColor = colors.keySpecialBackground,
                             labelColor = colors.textPrimary
                         ),
                         border = FilterChipDefaults.filterChipBorder(
@@ -257,7 +260,7 @@ fun UnicodeGridView(
                             borderColor = colors.keyBorder,
                             selectedBorderColor = colors.accent
                         ),
-                        modifier = Modifier.height(28.dp).testTag("chip_recents")
+                        modifier = Modifier.height(30.dp).testTag("chip_recents")
                     )
 
                     // Custom User Collections Chips
@@ -266,13 +269,14 @@ fun UnicodeGridView(
                         FilterChip(
                             selected = isSelected,
                             onClick = { onSelectCustomCollection(collectionName) },
+                            shape = RoundedCornerShape(9.dp),
                             label = {
                                 Text("📁 $collectionName", fontSize = 11.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium)
                             },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = colors.accent,
                                 selectedLabelColor = colors.accentText,
-                                containerColor = colors.keyBackground,
+                                containerColor = colors.keySpecialBackground,
                                 labelColor = colors.textPrimary
                             ),
                             border = FilterChipDefaults.filterChipBorder(
@@ -281,7 +285,7 @@ fun UnicodeGridView(
                                 borderColor = colors.keyBorder,
                                 selectedBorderColor = colors.accent
                             ),
-                            modifier = Modifier.height(28.dp).testTag("chip_col_$collectionName")
+                            modifier = Modifier.height(30.dp).testTag("chip_col_$collectionName")
                         )
                     }
 
@@ -291,6 +295,7 @@ fun UnicodeGridView(
                         FilterChip(
                             selected = isSelected,
                             onClick = { onSelectBlock(block) },
+                            shape = RoundedCornerShape(9.dp),
                             label = {
                                 Text(
                                     text = "${block.icon} ${block.name}",
@@ -302,7 +307,7 @@ fun UnicodeGridView(
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = colors.accent,
                                 selectedLabelColor = colors.accentText,
-                                containerColor = colors.keyBackground,
+                                containerColor = colors.keySpecialBackground,
                                 labelColor = colors.textPrimary
                             ),
                             border = FilterChipDefaults.filterChipBorder(
@@ -311,7 +316,7 @@ fun UnicodeGridView(
                                 borderColor = colors.keyBorder,
                                 selectedBorderColor = colors.accent
                             ),
-                            modifier = Modifier.height(28.dp).testTag("chip_${block.id}")
+                            modifier = Modifier.height(30.dp).testTag("chip_${block.id}")
                         )
                     }
                 }
@@ -324,8 +329,9 @@ fun UnicodeGridView(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.keySpecialBackground)
-                    .padding(horizontal = 10.dp, vertical = 2.dp),
+                    .background(colors.cardBackground)
+                    .border(width = 0.8.dp, color = colors.divider)
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -333,45 +339,82 @@ fun UnicodeGridView(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text(
-                        text = selectedCharacter.char,
-                        color = colors.textPrimary,
-                        fontSize = 18.sp,
-                        fontFamily = NotoSansSymbolsFamily,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Text(
-                        text = "U+${selectedCharacter.hex} • ${selectedCharacter.name}",
-                        color = colors.textSecondary,
-                        fontSize = 11.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(34.dp)
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(colors.keySpecialBackground)
+                            .border(0.8.dp, colors.keyBorder, RoundedCornerShape(9.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = selectedCharacter.char,
+                            color = colors.textPrimary,
+                            fontSize = 18.sp,
+                            fontFamily = NotoSansSymbolsFamily,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "U+${selectedCharacter.hex}",
+                                color = colors.accent,
+                                fontSize = 11.5.sp,
+                                fontFamily = FontFamily.Monospace,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = selectedCharacter.name,
+                                color = colors.textPrimary,
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(
-                        onClick = { onToggleFavorite(selectedCharacter.codePoint) },
-                        modifier = Modifier.size(28.dp).testTag("quick_favorite_button")
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(31.dp)
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(colors.keySpecialBackground)
+                            .border(0.8.dp, colors.keyBorder, RoundedCornerShape(9.dp))
+                            .clickable { onToggleFavorite(selectedCharacter.codePoint) }
+                            .testTag("quick_favorite_button"),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = if (isCurrentFav) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                             contentDescription = if (isCurrentFav) "Remove from favorites" else "Add to favorites",
-                            tint = if (isCurrentFav) Color(0xFFFFB300) else colors.textSecondary,
-                            modifier = Modifier.size(17.dp)
+                            tint = if (isCurrentFav) colors.accent else colors.textSecondary,
+                            modifier = Modifier.size(16.dp)
                         )
                     }
 
-                    IconButton(
-                        onClick = { onOpenInspector(selectedCharacter) },
-                        modifier = Modifier.size(28.dp).testTag("quick_inspector_button")
+                    Box(
+                        modifier = Modifier
+                            .size(31.dp)
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(colors.keySpecialBackground)
+                            .border(0.8.dp, colors.keyBorder, RoundedCornerShape(9.dp))
+                            .clickable { onOpenInspector(selectedCharacter) }
+                            .testTag("quick_inspector_button"),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = "Inspect ${selectedCharacter.char}",
                             tint = colors.accent,
-                            modifier = Modifier.size(17.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
@@ -389,27 +432,35 @@ fun UnicodeGridView(
                 if (isFavoritesActive) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier.padding(20.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(24.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.FavoriteBorder,
-                            contentDescription = null,
-                            tint = colors.textSecondary.copy(alpha = 0.5f),
-                            modifier = Modifier.size(28.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(colors.keySpecialBackground),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.FavoriteBorder,
+                                contentDescription = null,
+                                tint = colors.accent,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                         Text(
                             text = "No favorites yet",
                             color = colors.textPrimary,
-                            fontSize = 13.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                         Text(
                             text = "Tap any character & tap the star (★), or hold a character to inspect & favorite.",
                             color = colors.textSecondary,
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             textAlign = TextAlign.Center,
-                            lineHeight = 15.sp
+                            lineHeight = 16.sp
                         )
                     }
                 } else {
@@ -425,9 +476,9 @@ fun UnicodeGridView(
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(8),
-                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(3.dp),
-                verticalArrangement = Arrangement.spacedBy(3.dp),
+                contentPadding = PaddingValues(horizontal = 6.dp, vertical = 5.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
@@ -440,13 +491,13 @@ fun UnicodeGridView(
                     val isCurrent = selectedCharacter?.codePoint == charItem.codePoint
                     Box(
                         modifier = Modifier
-                            .height(48.dp)
-                            .clip(RoundedCornerShape(6.dp))
+                            .height(50.dp)
+                            .clip(RoundedCornerShape(9.dp))
                             .background(if (isCurrent) colors.keyBackgroundPressed else colors.keyBackground)
                             .border(
                                 width = if (isCurrent) 1.5.dp else 0.8.dp,
                                 color = if (isCurrent) colors.accent else colors.keyBorder,
-                                shape = RoundedCornerShape(6.dp)
+                                shape = RoundedCornerShape(9.dp)
                             )
                             .combinedClickable(
                                 onClick = { onCharacterClick(charItem) },
@@ -462,16 +513,17 @@ fun UnicodeGridView(
                             Text(
                                 text = charItem.char,
                                 color = colors.textPrimary,
-                                fontSize = 18.sp,
+                                fontSize = 19.sp,
                                 fontFamily = NotoSansSymbolsFamily,
                                 textAlign = TextAlign.Center,
                                 maxLines = 1
                             )
                             Text(
                                 text = charItem.hex,
-                                color = colors.textSecondary.copy(alpha = 0.8f),
-                                fontSize = 8.sp,
+                                color = if (isCurrent) colors.accent else colors.textSecondary.copy(alpha = 0.85f),
+                                fontSize = 8.5.sp,
                                 fontFamily = FontFamily.Monospace,
+                                fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal,
                                 textAlign = TextAlign.Center,
                                 maxLines = 1
                             )

@@ -19,6 +19,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -83,6 +84,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -95,6 +97,7 @@ import com.example.ui.keyboard.CharbonKeyboardContent
 import com.example.ui.theme.CharbonTheme
 import com.example.ui.theme.LightCharbonColors
 import com.example.ui.theme.LocalCharbonColors
+import com.example.ui.theme.NotoSansSymbolsFamily
 
 class MainActivity : ComponentActivity() {
 
@@ -217,20 +220,45 @@ fun CharbonSetupScreen() {
                     title = {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth().padding(end = 8.dp)
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_charbon_logo),
-                                contentDescription = "Charbon Logo",
-                                modifier = Modifier.size(32.dp),
-                                colorFilter = if (colors == LightCharbonColors) null else ColorFilter.tint(colors.textPrimary)
-                            )
-                            Text(
-                                text = "Charbon",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = colors.textPrimary
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_charbon_logo),
+                                    contentDescription = "Charbon Logo",
+                                    modifier = Modifier.size(32.dp),
+                                    colorFilter = if (colors == LightCharbonColors) null else ColorFilter.tint(colors.textPrimary)
+                                )
+                                Text(
+                                    text = "Charbon",
+                                    fontSize = 21.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colors.textPrimary,
+                                    letterSpacing = (-0.3).sp
+                                )
+                            }
+
+                            // Version Badge
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(colors.keySpecialBackground)
+                                    .border(1.dp, colors.keyBorder, RoundedCornerShape(8.dp))
+                                    .padding(horizontal = 9.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = "v1.5",
+                                    color = colors.accent,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace,
+                                    letterSpacing = 0.5.sp
+                                )
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -248,7 +276,7 @@ fun CharbonSetupScreen() {
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 item {
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     // Setup Status Banner
                     SetupStatusCard(
                         isKeyboardEnabled = isKeyboardEnabled,
@@ -362,6 +390,11 @@ fun CharbonSetupScreen() {
                                         fontSize = 14.sp
                                     )
                                 },
+                                textStyle = androidx.compose.ui.text.TextStyle(
+                                    color = colors.textPrimary,
+                                    fontSize = 15.sp,
+                                    fontFamily = NotoSansSymbolsFamily
+                                ),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .testTag("sandbox_text_field"),
@@ -379,7 +412,7 @@ fun CharbonSetupScreen() {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 8.dp),
+                                    .padding(top = 10.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 OutlinedButton(
@@ -389,24 +422,26 @@ fun CharbonSetupScreen() {
                                         clipboard?.setPrimaryClip(clip)
                                         Toast.makeText(context, "Copied to clipboard", Toast.LENGTH_SHORT).show()
                                     },
-                                    modifier = Modifier.weight(1f).height(32.dp),
-                                    shape = RoundedCornerShape(8.dp)
+                                    modifier = Modifier.weight(1f).height(36.dp),
+                                    shape = RoundedCornerShape(10.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, colors.keyBorder)
                                 ) {
                                     Icon(Icons.Default.ContentCopy, contentDescription = "Copy", modifier = Modifier.size(14.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Copy", fontSize = 11.sp)
+                                    Text("Copy", fontSize = 12.sp, fontWeight = FontWeight.Medium)
                                 }
 
                                 OutlinedButton(
                                     onClick = {
                                         testTextFieldValue = TextFieldValue("")
                                     },
-                                    modifier = Modifier.weight(1f).height(32.dp),
-                                    shape = RoundedCornerShape(8.dp)
+                                    modifier = Modifier.weight(1f).height(36.dp),
+                                    shape = RoundedCornerShape(10.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, colors.keyBorder)
                                 ) {
                                     Icon(Icons.Default.Clear, contentDescription = "Clear", modifier = Modifier.size(14.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Clear", fontSize = 11.sp)
+                                    Text("Clear", fontSize = 12.sp, fontWeight = FontWeight.Medium)
                                 }
 
                                 OutlinedButton(
@@ -414,12 +449,13 @@ fun CharbonSetupScreen() {
                                         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
                                         imm?.showInputMethodPicker()
                                     },
-                                    modifier = Modifier.weight(1.3f).height(32.dp),
-                                    shape = RoundedCornerShape(8.dp)
+                                    modifier = Modifier.weight(1.3f).height(36.dp),
+                                    shape = RoundedCornerShape(10.dp),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, colors.keyBorder)
                                 ) {
                                     Icon(Icons.Default.TouchApp, contentDescription = "Pick IME", modifier = Modifier.size(14.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Pick System IME", fontSize = 11.sp)
+                                    Text("Pick System IME", fontSize = 11.5.sp, fontWeight = FontWeight.Medium)
                                 }
                             }
 
@@ -827,19 +863,56 @@ fun CharbonSetupScreen() {
                                     fontWeight = FontWeight.SemiBold
                                 )
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Charbon bundles high-density Noto Sans Symbols with complete coverage of:\n" +
-                                        "• Geometric Shapes (▭ U+25AD White rectangle, ■, □, ▬, ▲, ▼, ◆, ◉)\n" +
-                                        "• Box Drawing & Framing (╔, ╗, ╚, ╝, ║, ═, ╬)\n" +
-                                        "• Block Elements (█, ▀, ▄, ▌, ░, ▒, ▓)\n" +
-                                        "• Mathematical Operators & Calculus (∑, ∏, √, ∞, ∫, ≈, ≠, ≤, ≥)\n" +
-                                        "• Arrows & Currency (←, ↑, →, ➔, ⇐, ⇒, €, ₽, ₹, ₿)\n" +
-                                        "• Subscripts, Greek, Dingbats, Runic, Braille, and Enclosed numbers.",
+                                text = "Charbon bundles high-density Noto Sans Symbols with complete coverage across core Unicode blocks:",
                                 color = colors.textSecondary,
                                 fontSize = 12.sp,
-                                lineHeight = 18.sp
+                                lineHeight = 16.sp
                             )
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Visual Glyph Categories
+                            val categories = listOf(
+                                "Geometric Shapes" to listOf("▭", "■", "□", "▲", "▼", "◆", "◉", "◈"),
+                                "Box & Framing" to listOf("╔", "╗", "╚", "╝", "║", "═", "╬", "╦"),
+                                "Block Elements" to listOf("█", "▀", "▄", "▌", "░", "▒", "▓", "▐"),
+                                "Math & Calculus" to listOf("∑", "∏", "√", "∞", "∫", "≈", "≠", "≤", "≥"),
+                                "Arrows & Direction" to listOf("←", "↑", "→", "➔", "⇐", "⇒", "➜", "↺"),
+                                "Global Currency" to listOf("€", "₽", "₹", "₿", "¥", "¢", "£", "₩")
+                            )
+
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                for ((catName, glyphs) in categories) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(colors.keyBackground)
+                                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = catName,
+                                            color = colors.accent,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                                            for (g in glyphs) {
+                                                Text(
+                                                    text = g,
+                                                    fontFamily = NotoSansSymbolsFamily,
+                                                    fontSize = 13.sp,
+                                                    color = colors.textPrimary,
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -848,14 +921,15 @@ fun CharbonSetupScreen() {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp),
+                            .padding(vertical = 14.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Charbon • Version 1.2",
-                            color = colors.textSecondary.copy(alpha = 0.6f),
+                            text = "Charbon • Elemental Unicode Keyboard • Version 1.5",
+                            color = colors.textSecondary.copy(alpha = 0.75f),
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            letterSpacing = 0.3.sp
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -872,10 +946,10 @@ private fun SetupStatusCard(
     colors: com.example.ui.theme.CharbonColors
 ) {
     val isReady = isKeyboardEnabled && isKeyboardDefault
-    val statusBg = if (isReady) Color(0xFF10B981).copy(alpha = 0.15f) else colors.accent.copy(alpha = 0.12f)
-    val statusBorder = if (isReady) Color(0xFF10B981).copy(alpha = 0.4f) else colors.accent.copy(alpha = 0.3f)
+    val statusBg = if (isReady) colors.success.copy(alpha = 0.12f) else colors.accent.copy(alpha = 0.10f)
+    val statusBorder = if (isReady) colors.success.copy(alpha = 0.35f) else colors.accent.copy(alpha = 0.25f)
     val statusIcon = if (isReady) Icons.Default.CheckCircle else Icons.Default.Settings
-    val statusColor = if (isReady) Color(0xFF10B981) else colors.accent
+    val statusColor = if (isReady) colors.success else colors.accent
 
     Box(
         modifier = Modifier
@@ -883,30 +957,64 @@ private fun SetupStatusCard(
             .clip(RoundedCornerShape(16.dp))
             .background(statusBg)
             .border(1.dp, statusBorder, RoundedCornerShape(16.dp))
-            .padding(14.dp)
+            .padding(16.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = statusIcon,
-                contentDescription = null,
-                tint = statusColor,
-                modifier = Modifier.size(32.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text(
-                    text = if (isReady) "Charbon Keyboard is Active & Ready!" else "Setup Charbon as Your Keyboard",
-                    color = colors.textPrimary,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(CircleShape)
+                    .background(statusColor.copy(alpha = 0.15f))
+                    .border(1.dp, statusColor.copy(alpha = 0.3f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = statusIcon,
+                    contentDescription = null,
+                    tint = statusColor,
+                    modifier = Modifier.size(24.dp)
                 )
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = if (isReady) "Charbon Active & Ready" else "Setup Required",
+                        color = colors.textPrimary,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.15).sp
+                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(if (isReady) colors.success.copy(alpha = 0.2f) else colors.accent.copy(alpha = 0.18f))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = if (isReady) "ACTIVE" else "PENDING",
+                            color = if (isReady) colors.success else colors.accent,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.6.sp
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(3.dp))
                 Text(
                     text = if (isReady)
                         "You can now type extended Unicode in any app (browser, notes, chat, terminal)."
                     else
-                        "Complete the two steps below to enable and set Charbon as default.",
+                        "Complete the two quick steps below to enable Charbon and set it as your default keyboard.",
                     color = colors.textSecondary,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
                 )
             }
         }
@@ -926,7 +1034,8 @@ private fun StepCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = colors.toolbarBackground),
+        colors = CardDefaults.cardColors(containerColor = colors.cardBackground),
+        border = androidx.compose.foundation.BorderStroke(1.dp, colors.keyBorder.copy(alpha = 0.7f)),
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(
@@ -942,10 +1051,10 @@ private fun StepCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(34.dp)
                         .clip(CircleShape)
-                        .background(if (isCompleted) Color(0xFF10B981) else colors.keySpecialBackground)
-                        .border(1.dp, if (isCompleted) Color(0xFF10B981) else colors.keyBorder, CircleShape),
+                        .background(if (isCompleted) colors.success else colors.keySpecialBackground)
+                        .border(1.dp, if (isCompleted) colors.success else colors.keyBorder, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     if (isCompleted) {
@@ -992,6 +1101,7 @@ private fun StepCard(
                     containerColor = if (isCompleted) colors.keySpecialBackground else colors.accent,
                     contentColor = if (isCompleted) colors.textPrimary else colors.accentText
                 ),
+                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 8.dp),
                 modifier = Modifier.testTag(tag)
             ) {
                 Text(
@@ -1020,11 +1130,18 @@ private fun ThemePill(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
+    val previewColor = when (label) {
+        "Light" -> Color(0xFFF7F6F2)
+        "Dark" -> Color(0xFF181A20)
+        "AMOLED" -> Color(0xFF000000)
+        else -> colors.accent
+    }
+
     Box(
         modifier = modifier
             .height(36.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(if (isSelected) colors.accent else colors.keyBackground)
+            .background(if (isSelected) colors.accent else colors.cardBackground)
             .border(
                 1.dp,
                 if (isSelected) colors.accent else colors.keyBorder,
@@ -1037,11 +1154,12 @@ private fun ThemePill(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(
-                imageVector = if (isSelected) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
-                contentDescription = null,
-                tint = if (isSelected) colors.accentText else colors.textSecondary,
-                modifier = Modifier.size(14.dp)
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .clip(CircleShape)
+                    .background(previewColor)
+                    .border(1.dp, if (isSelected) colors.accentText.copy(alpha = 0.8f) else colors.keyBorder, CircleShape)
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(

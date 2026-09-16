@@ -21,6 +21,7 @@ val NotoSansSymbolsFamily = FontFamily(
 data class CharbonColors(
     val keyboardBackground: Color,
     val toolbarBackground: Color,
+    val cardBackground: Color,
     val keyBackground: Color,
     val keyBackgroundPressed: Color,
     val keySpecialBackground: Color,
@@ -28,7 +29,10 @@ data class CharbonColors(
     val textPrimary: Color,
     val textSecondary: Color,
     val accent: Color,
-    val accentText: Color
+    val accentText: Color,
+    val accentLight: Color,
+    val divider: Color,
+    val success: Color
 )
 
 val LocalCharbonColors = staticCompositionLocalOf {
@@ -36,42 +40,54 @@ val LocalCharbonColors = staticCompositionLocalOf {
 }
 
 val LightCharbonColors = CharbonColors(
-    keyboardBackground = Color(0xFFF1F3F6),
-    toolbarBackground = Color(0xFFE4E7EC),
+    keyboardBackground = Color(0xFFF7F6F2),
+    toolbarBackground = Color(0xFFEFECE6),
+    cardBackground = Color(0xFFFFFFFF),
     keyBackground = Color(0xFFFFFFFF),
-    keyBackgroundPressed = Color(0xFFE2E6EC),
-    keySpecialBackground = Color(0xFFD6DBE2),
-    keyBorder = Color(0xFFCBD2DA),
-    textPrimary = Color(0xFF111827),
-    textSecondary = Color(0xFF6B7280),
-    accent = Color(0xFF2563EB),
-    accentText = Color(0xFFFFFFFF)
+    keyBackgroundPressed = Color(0xFFE5E0D6),
+    keySpecialBackground = Color(0xFFEBE6DD),
+    keyBorder = Color(0xFFDDD7CC),
+    textPrimary = Color(0xFF191B1F),
+    textSecondary = Color(0xFF6B707B),
+    accent = Color(0xFFD97724),
+    accentText = Color(0xFFFFFFFF),
+    accentLight = Color(0xFFFDF2E7),
+    divider = Color(0xFFE8E4DC),
+    success = Color(0xFF2E9E68)
 )
 
 val DarkCharbonColors = CharbonColors(
-    keyboardBackground = Color(0xFF1A1C20),
-    toolbarBackground = Color(0xFF24272D),
-    keyBackground = Color(0xFF2E323A),
-    keyBackgroundPressed = Color(0xFF3B404A),
-    keySpecialBackground = Color(0xFF23262D),
-    keyBorder = Color(0xFF383C46),
-    textPrimary = Color(0xFFF3F4F6),
-    textSecondary = Color(0xFF9CA3AF),
-    accent = Color(0xFF3B82F6),
-    accentText = Color(0xFFFFFFFF)
+    keyboardBackground = Color(0xFF111215),
+    toolbarBackground = Color(0xFF17191E),
+    cardBackground = Color(0xFF181A20),
+    keyBackground = Color(0xFF22242B),
+    keyBackgroundPressed = Color(0xFF30333D),
+    keySpecialBackground = Color(0xFF191B21),
+    keyBorder = Color(0xFF2B2E37),
+    textPrimary = Color(0xFFF4F3F0),
+    textSecondary = Color(0xFF8E93A0),
+    accent = Color(0xFFE88938),
+    accentText = Color(0xFF111215),
+    accentLight = Color(0x33E88938),
+    divider = Color(0xFF242730),
+    success = Color(0xFF34D399)
 )
 
 val AmoledCharbonColors = CharbonColors(
     keyboardBackground = Color(0xFF000000),
-    toolbarBackground = Color(0xFF0D0E10),
-    keyBackground = Color(0xFF14161A),
-    keyBackgroundPressed = Color(0xFF22252C),
-    keySpecialBackground = Color(0xFF0A0B0E),
-    keyBorder = Color(0xFF252830),
-    textPrimary = Color(0xFFFFFFFF),
-    textSecondary = Color(0xFF8E95A2),
-    accent = Color(0xFF60A5FA),
-    accentText = Color(0xFF000000)
+    toolbarBackground = Color(0xFF0C0D10),
+    cardBackground = Color(0xFF0F1014),
+    keyBackground = Color(0xFF16181F),
+    keyBackgroundPressed = Color(0xFF252833),
+    keySpecialBackground = Color(0xFF0B0C0F),
+    keyBorder = Color(0xFF20232C),
+    textPrimary = Color(0xFFFBFBF9),
+    textSecondary = Color(0xFF838794),
+    accent = Color(0xFFF29542),
+    accentText = Color(0xFF000000),
+    accentLight = Color(0x33F29542),
+    divider = Color(0xFF1B1D24),
+    success = Color(0xFF34D399)
 )
 
 @Composable

@@ -161,9 +161,9 @@ private fun CursorActionButton(
     Row(
         modifier = modifier
             .height(38.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(9.dp))
             .background(colors.keySpecialBackground)
-            .border(0.8.dp, colors.keyBorder, RoundedCornerShape(8.dp))
+            .border(0.8.dp, colors.keyBorder, RoundedCornerShape(9.dp))
             .clickable { onClick() }
             .padding(horizontal = 6.dp),
         horizontalArrangement = Arrangement.Center,
