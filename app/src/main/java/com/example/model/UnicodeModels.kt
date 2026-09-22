@@ -33,7 +33,8 @@ enum class KeyboardMode {
     ALPHANUMERIC,
     ARROW_PAD,
     KAOMOJI,
-    CLIPBOARD
+    CLIPBOARD,
+    MARKDOWN
 }
 
 enum class CharbonThemeMode {

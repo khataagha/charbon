@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FormatShapes
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -50,6 +51,13 @@ import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.ViewHeadline
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.runtime.mutableStateListOf
+import com.example.model.ActiveFormatState
+import com.example.model.InlineFormat
+import com.example.model.MarkdownFormattingEngine
+import com.example.ui.markdown.MarkdownPreviewView
+import com.example.ui.markdown.MarkdownToolbar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -123,23 +131,84 @@ fun CharbonSetupScreen() {
     var newCollectionName by remember { mutableStateOf("") }
     var newCollectionCodepoints by remember { mutableStateOf("") }
     var testTextFieldValue by remember {
-        mutableStateOf(TextFieldValue("▭ ╔═╗ ∑(x) ➔"))
+        mutableStateOf(TextFieldValue("# Welcome to **Charbon**\n\nExperience rich *Markdown* formatting, `code`, and extended Unicode: ▭ ╔═╗ ∑(x) ➔"))
     }
     var showInAppKeyboard by remember { mutableStateOf(true) }
+    var sandboxTab by remember { mutableStateOf("editor") } // "editor" or "preview"
+    var pendingInlineStyles by remember { mutableStateOf(setOf<InlineFormat>()) }
+    val undoStack = remember { mutableStateListOf<TextFieldValue>() }
+    val redoStack = remember { mutableStateListOf<TextFieldValue>() }
+
+    fun pushUndo(value: TextFieldValue) {
+        if (undoStack.size > 50) undoStack.removeAt(0)
+        undoStack.add(value)
+        redoStack.clear()
+    }
+
+    fun handleUndo() {
+        if (undoStack.isNotEmpty()) {
+            redoStack.add(testTextFieldValue)
+            testTextFieldValue = undoStack.removeAt(undoStack.lastIndex)
+        }
+    }
+
+    fun handleRedo() {
+        if (redoStack.isNotEmpty()) {
+            undoStack.add(testTextFieldValue)
+            testTextFieldValue = redoStack.removeAt(redoStack.lastIndex)
+        }
+    }
+
+    fun toggleInlineFormat(format: InlineFormat) {
+        pushUndo(testTextFieldValue)
+        val (newVal, newPending) = MarkdownFormattingEngine.toggleInlineFormat(
+            value = testTextFieldValue,
+            format = format,
+            pendingStyles = pendingInlineStyles
+        )
+        testTextFieldValue = newVal
+        pendingInlineStyles = newPending
+    }
+
+    fun toggleHeading() {
+        pushUndo(testTextFieldValue)
+        testTextFieldValue = MarkdownFormattingEngine.toggleHeading(testTextFieldValue)
+    }
+
+    fun toggleBlockquote() {
+        pushUndo(testTextFieldValue)
+        testTextFieldValue = MarkdownFormattingEngine.toggleBlockquote(testTextFieldValue)
+    }
+
+    fun toggleBulletList() {
+        pushUndo(testTextFieldValue)
+        testTextFieldValue = MarkdownFormattingEngine.toggleBulletList(testTextFieldValue)
+    }
+
+    fun toggleNumberedList() {
+        pushUndo(testTextFieldValue)
+        testTextFieldValue = MarkdownFormattingEngine.toggleNumberedList(testTextFieldValue)
+    }
+
+    fun toggleCodeBlock() {
+        pushUndo(testTextFieldValue)
+        testTextFieldValue = MarkdownFormattingEngine.toggleCodeBlock(testTextFieldValue)
+    }
+
+    fun insertLink() {
+        pushUndo(testTextFieldValue)
+        testTextFieldValue = MarkdownFormattingEngine.insertLink(testTextFieldValue)
+    }
 
     var isKeyboardEnabled by remember { mutableStateOf(checkIsKeyboardEnabled(context)) }
     var isKeyboardDefault by remember { mutableStateOf(checkIsKeyboardDefault(context)) }
 
     fun insertTextToSandbox(textToInsert: String) {
-        val currentText = testTextFieldValue.text
-        val selection = testTextFieldValue.selection
-        val start = selection.min
-        val end = selection.max
-        val newText = currentText.substring(0, start) + textToInsert + currentText.substring(end)
-        val newCursorPos = start + textToInsert.length
-        testTextFieldValue = TextFieldValue(
-            text = newText,
-            selection = TextRange(newCursorPos)
+        pushUndo(testTextFieldValue)
+        testTextFieldValue = MarkdownFormattingEngine.handleTextCommit(
+            current = testTextFieldValue,
+            textToInsert = textToInsert,
+            pendingStyles = pendingInlineStyles
         )
     }
 
@@ -251,7 +320,7 @@ fun CharbonSetupScreen() {
                                     .padding(horizontal = 9.dp, vertical = 4.dp)
                             ) {
                                 Text(
-                                    text = "v1.5",
+                                    text = "v1.6",
                                     color = colors.accent,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
@@ -350,63 +419,122 @@ fun CharbonSetupScreen() {
                                     )
                                 }
 
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    OutlinedButton(
-                                        onClick = { showInAppKeyboard = !showInAppKeyboard },
-                                        shape = RoundedCornerShape(8.dp),
-                                        colors = ButtonDefaults.outlinedButtonColors(
-                                            contentColor = colors.accent
-                                        ),
-                                        modifier = Modifier.height(30.dp)
+                                Row(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(colors.keySpecialBackground)
+                                        .border(0.8.dp, colors.keyBorder, RoundedCornerShape(8.dp))
+                                        .padding(2.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(if (sandboxTab == "editor") colors.accent else androidx.compose.ui.graphics.Color.Transparent)
+                                            .clickable { sandboxTab = "editor" }
+                                            .padding(horizontal = 9.dp, vertical = 4.dp),
+                                        contentAlignment = Alignment.Center
                                     ) {
-                                        Icon(
-                                            imageVector = if (showInAppKeyboard) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
                                         Text(
-                                            text = if (showInAppKeyboard) "Hide Keyboard" else "Show Keyboard",
-                                            fontSize = 11.sp
+                                            text = "Editor",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (sandboxTab == "editor") androidx.compose.ui.graphics.Color.Black else colors.textPrimary
+                                        )
+                                    }
+
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(if (sandboxTab == "preview") colors.accent else androidx.compose.ui.graphics.Color.Transparent)
+                                            .clickable { sandboxTab = "preview" }
+                                            .padding(horizontal = 9.dp, vertical = 4.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "Preview",
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (sandboxTab == "preview") androidx.compose.ui.graphics.Color.Black else colors.textPrimary
                                         )
                                     }
                                 }
                             }
 
                             Text(
-                                text = "Test typing extended Unicode characters (such as ▭ U+25AD, ╔, ∑, ➔) live using the interactive Charbon keyboard below, or tap the text field to type manually.",
+                                text = "Test typing extended Unicode characters (such as ▭ U+25AD, ╔, ∑, ➔) and rich Markdown formatting live below.",
                                 color = colors.textSecondary,
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(top = 4.dp, bottom = 10.dp)
                             )
 
-                            OutlinedTextField(
+                            val activeMarkdownState = MarkdownFormattingEngine.detectActiveFormats(
                                 value = testTextFieldValue,
-                                onValueChange = { testTextFieldValue = it },
-                                placeholder = {
-                                    Text(
-                                        "Tap keyboard keys below to test Charbon...",
-                                        color = colors.textSecondary.copy(alpha = 0.6f),
-                                        fontSize = 14.sp
-                                    )
-                                },
-                                textStyle = androidx.compose.ui.text.TextStyle(
-                                    color = colors.textPrimary,
-                                    fontSize = 15.sp,
-                                    fontFamily = NotoSansSymbolsFamily
-                                ),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag("sandbox_text_field"),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = colors.accent,
-                                    unfocusedBorderColor = colors.keyBorder,
-                                    focusedTextColor = colors.textPrimary,
-                                    unfocusedTextColor = colors.textPrimary,
-                                    cursorColor = colors.accent
-                                ),
-                                shape = RoundedCornerShape(12.dp)
+                                pendingInlineStyles = pendingInlineStyles
                             )
+
+                            if (sandboxTab == "editor") {
+                                // Formatting Toolbar
+                                MarkdownToolbar(
+                                    activeState = activeMarkdownState,
+                                    canUndo = undoStack.isNotEmpty(),
+                                    canRedo = redoStack.isNotEmpty(),
+                                    onToggleInline = { toggleInlineFormat(it) },
+                                    onToggleHeading = { toggleHeading() },
+                                    onToggleBlockquote = { toggleBlockquote() },
+                                    onToggleBulletList = { toggleBulletList() },
+                                    onToggleNumberedList = { toggleNumberedList() },
+                                    onToggleCodeBlock = { toggleCodeBlock() },
+                                    onInsertLink = { insertLink() },
+                                    onUndo = { handleUndo() },
+                                    onRedo = { handleRedo() },
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+
+                                OutlinedTextField(
+                                    value = testTextFieldValue,
+                                    onValueChange = { newVal ->
+                                        if (newVal.text != testTextFieldValue.text) {
+                                            pushUndo(testTextFieldValue)
+                                        }
+                                        testTextFieldValue = newVal
+                                    },
+                                    placeholder = {
+                                        Text(
+                                            "Tap keyboard keys or formatting buttons above...",
+                                            color = colors.textSecondary.copy(alpha = 0.6f),
+                                            fontSize = 14.sp
+                                        )
+                                    },
+                                    textStyle = androidx.compose.ui.text.TextStyle(
+                                        color = colors.textPrimary,
+                                        fontSize = 15.sp,
+                                        fontFamily = NotoSansSymbolsFamily
+                                    ),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .testTag("sandbox_text_field"),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = colors.accent,
+                                        unfocusedBorderColor = colors.keyBorder,
+                                        focusedTextColor = colors.textPrimary,
+                                        unfocusedTextColor = colors.textPrimary,
+                                        cursorColor = colors.accent
+                                    ),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(colors.keySpecialBackground)
+                                        .border(1.dp, colors.keyBorder, RoundedCornerShape(12.dp))
+                                        .padding(4.dp)
+                                ) {
+                                    MarkdownPreviewView(markdownText = testTextFieldValue.text)
+                                }
+                            }
 
                             // Quick actions row
                             Row(
@@ -925,7 +1053,7 @@ fun CharbonSetupScreen() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Charbon • Elemental Unicode Keyboard • Version 1.5",
+                            text = "Charbon • Elemental Unicode Keyboard • Version 1.6",
                             color = colors.textSecondary.copy(alpha = 0.75f),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,

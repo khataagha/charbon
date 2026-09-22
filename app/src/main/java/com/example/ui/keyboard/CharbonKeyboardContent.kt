@@ -25,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
 import androidx.compose.material.icons.filled.Brightness4
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FormatShapes
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Mood
@@ -189,6 +190,18 @@ fun CharbonKeyboardContent(
                             performHaptic()
                         },
                         tag = "tab_kaomoji"
+                    )
+
+                    // Markdown Tab
+                    ToolbarPill(
+                        label = "MD",
+                        icon = Icons.Default.EditNote,
+                        isSelected = currentMode == KeyboardMode.MARKDOWN,
+                        onClick = {
+                            currentMode = KeyboardMode.MARKDOWN
+                            performHaptic()
+                        },
+                        tag = "tab_markdown"
                     )
                 }
 
@@ -374,6 +387,24 @@ fun CharbonKeyboardContent(
                                 onInsertText(text)
                                 performHaptic()
                             }
+                        )
+                    }
+
+                    KeyboardMode.MARKDOWN -> {
+                        MarkdownKeyboardView(
+                            onInsertText = { text ->
+                                onInsertText(text)
+                                performHaptic()
+                            },
+                            onBackspace = {
+                                onBackspace()
+                                performHaptic()
+                            },
+                            onEnter = {
+                                onEnter()
+                                performHaptic()
+                            },
+                            onPerformHaptic = { performHaptic() }
                         )
                     }
 
